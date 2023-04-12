@@ -11,7 +11,9 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
     }),
     CostModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/costs-app'),
+    MongooseModule.forRoot(
+      `mongodb+srv://ncorradini:${process.env.PASSWORD_USER_MONGODB}@cluster0.p1mm9yw.mongodb.net/?retryWrites=true&w=majority`,
+    ),
   ],
   controllers: [AppController],
   providers: [AppService],
