@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { ICost } from './interfaces/cost.interface';
-import { CreateCostDTO } from './dto/cost.dto';
+import { CreateCostDTO } from './dto/create-cost.dto';
 
 @Injectable()
 export class CostService {

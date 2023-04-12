@@ -11,15 +11,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CostService } from './cost.service';
-import { CreateCostDTO } from './dto/cost.dto';
+import { CostDTO } from './dto/cost.dto';
 
 @Controller('cost')
 export class CostController {
   constructor(private costService: CostService) {}
 
   @Post()
-  async createCost(@Res() res, @Body() createCostDTO: CreateCostDTO) {
-    const cost = await this.costService.createCost(createCostDTO);
+  async createCost(@Res() res, @Body() costDTO: CostDTO) {
+    if (costDTO.security_token !== process.env.SECURITY_TOKEN) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        message: 'Security Token is incorrect',
+      });
+    }
+
+    const cost = await this.costService.createCost(costDTO.cost);
     return res.status(HttpStatus.OK).json({
       message: 'Cost Successfully Created',
       cost,
@@ -43,7 +49,17 @@ export class CostController {
   }
 
   @Delete('/:costID')
-  async deleteCost(@Res() res, @Param('costID') costID) {
+  async deleteCost(
+    @Res() res,
+    @Body() body: { security_token: string },
+    @Param('costID') costID,
+  ) {
+    if (body.security_token !== process.env.SECURITY_TOKEN) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        message: 'Security Token is incorrect',
+      });
+    }
+
     try {
       const deletedCost = await this.costService.deleteCost(costID);
       return res.status(HttpStatus.OK).json({
@@ -58,13 +74,19 @@ export class CostController {
   @Put('/:costID')
   async updateCost(
     @Res() res,
-    @Body() createCostDTO: CreateCostDTO,
+    @Body() costDTO: CostDTO,
     @Param('costID') costID,
   ) {
+    if (costDTO.security_token !== process.env.SECURITY_TOKEN) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        message: 'Security Token is incorrect',
+      });
+    }
+
     try {
       const updatedCost = await this.costService.updateCost(
         costID,
-        createCostDTO,
+        costDTO.cost,
       );
       return res.status(HttpStatus.OK).json({
         message: 'Cost Updated Successfully',
